@@ -21,7 +21,11 @@ public class Main {
 
 	//Sorting.userInput(scanner.nextLine());
 
+           // FileDownloader.downloadFile("https://www.subtitlepedia.biz/download/finish/15/19972","dd.zip");
+        Sorting.buildConditions();
+        SubtitleSetter s = new SubtitleSetter();
 
+        SubtitleSetter.findAllSubtitlesInFolder(scanner.nextLine());
 
 
     }

@@ -4,11 +4,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.net.*;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class UrlManager
@@ -56,11 +57,29 @@ public class UrlManager
 
     }
 
+    public static Elements search(String search,ArrayList<String>condition){
+        java.lang.System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
+        try {
+            Element links = Jsoup.connect(search).timeout(50000).get();
+            Elements out = links.getAllElements();
+            if(condition.size() != 0) {
+                out = links.select(condition.get(0));
+                for (int i = 1; i < condition.size()-1; i++) {
+                    out = out.select(condition.get(i));
+                }
+            }
+            return out;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Element search(String search){
         java.lang.System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 
         try {
-
             Element links = Jsoup.connect(search).timeout(50000).get();
             return links;
         } catch (IOException e) {
@@ -68,6 +87,26 @@ public class UrlManager
         }
         return null;
     }
+
+    public static String SearchGoogle(String site,String search){
+        String google = "https://www.google.com/search?q=";
+        //String site = "subtitlepedia.biz";
+        search += " Site:"+site;
+        search.replaceAll(" ","+");
+        String charset = "UTF-8";
+
+
+        String target = null;
+
+        Elements links = UrlManager.search(google+search).select("div").select("a");
+        for (Element link : links) {
+            if(link.attr("href").startsWith("https://www." + site)){
+                target = link.attr("href");
+            }
+        }
+        return target;
+    }
+
 
     private static String toString(InputStream inputStream) throws IOException
     {
