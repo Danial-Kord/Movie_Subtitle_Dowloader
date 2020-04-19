@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Sorting {
     public static ArrayList<String>stringConditions= new ArrayList<String>();
@@ -23,19 +25,20 @@ public class Sorting {
         stringConditions.add("x264");
         stringConditions.add("x255");
         stringConditions.add("x265");
-        stringConditions.add("480");
+        stringConditions.add("480p");
         stringConditions.add("20");
         stringConditions.add("19");
         stringConditions.add("21");
         stringConditions.add("22");
-        stringConditions.add("1080");
-        stringConditions.add("720");
+        stringConditions.add("1080p");
+        stringConditions.add("720p");
         stringConditions.add("bluray");
         stringConditions.add("hdrip");
         stringConditions.add("hdcam");
         stringConditions.add("hdtv");
         stringConditions.add("4k");
         stringConditions.add("web");
+        stringConditions.add("10bit");
         for (int i=0;i<FileFinder.movieTypes.size();i++)
             stringConditions.add(FileFinder.movieTypes.get(i));
     }
@@ -62,6 +65,9 @@ public class Sorting {
                     temp += " " + year;
                     if (temp.endsWith("-1")) {
                         temp = temp.replace("-1","");
+                    }
+                    while (temp.endsWith(" ")) {
+                        temp = temp.substring(0,temp.length()-1);
                     }
                     System.out.println(temp + "..............." + year);
                     File dir = new File(dirPath + "\\" + temp);
@@ -150,6 +156,13 @@ public class Sorting {
                 if (flag)
                     break;
             }
+            if(isSerial(file)){
+                for (int i=0;i<f;i++){
+                  if(!isSerial(file.substring(i,f))) {
+                      return i+1;
+                  }
+                }
+            }
             return f;
         }
         public static int getYear (String in){
@@ -191,9 +204,18 @@ public class Sorting {
             return true;
         return false;
     }
+
+    public static boolean isSerial(String name){
+
+        name = name.toLowerCase().replaceAll("_","");
+        return name.matches("(.+)[s](\\d+)[e](\\d+)(.+)");
+
+    }
         public static String findName(File file) {
             if (isMovie(file)) {
-                String temp1 = file.getName().substring(0, index(stringConditions, file.getName()));
+
+                String fn = file.getName().substring(0,file.getName().lastIndexOf("."));
+                String temp1 = file.getName().substring(0, index(stringConditions,fn));
                 char[] temp2 = temp1.toCharArray();
                 String temp = "";
                 for (int i = 0; i < temp2.length; i++) {
